@@ -1,0 +1,2564 @@
+```html
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEON ARCADE</title>
+
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+:root{
+    --bg:#03050b;
+    --cyan:#00f7ff;
+    --green:#00ff66;
+    --red:#ff3150;
+    --purple:#9b5cff;
+    --text:#edf7ff;
+}
+
+body{
+    min-height:100vh;
+    background:
+        radial-gradient(circle at 20% 10%,#111947,transparent 30%),
+        radial-gradient(circle at 80% 80%,#30103d,transparent 30%),
+        var(--bg);
+    color:var(--text);
+    font-family:Arial,Helvetica,sans-serif;
+    overflow-x:hidden;
+}
+
+body:before{
+    content:"";
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    opacity:.08;
+    background-image:
+        linear-gradient(#fff 1px,transparent 1px),
+        linear-gradient(90deg,#fff 1px,transparent 1px);
+    background-size:50px 50px;
+}
+
+header{
+    position:sticky;
+    top:0;
+    z-index:1000;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:20px;
+    padding:15px 5%;
+    background:rgba(3,5,11,.85);
+    backdrop-filter:blur(16px);
+    border-bottom:1px solid rgba(0,247,255,.15);
+}
+
+.logo{
+    color:var(--cyan);
+    font-weight:900;
+    font-size:23px;
+    letter-spacing:3px;
+    text-shadow:0 0 20px var(--cyan);
+}
+
+nav{
+    display:flex;
+    gap:6px;
+    overflow-x:auto;
+}
+
+nav button{
+    white-space:nowrap;
+    color:#8794aa;
+    background:transparent;
+    border:1px solid transparent;
+    padding:9px 12px;
+    border-radius:9px;
+    cursor:pointer;
+}
+
+nav button:hover,
+nav button.active{
+    color:#fff;
+    border-color:var(--cyan);
+}
+
+.screen{
+    display:none;
+}
+
+.screen.active{
+    display:block;
+}
+
+.container,
+.game-shell{
+    width:min(1150px,94%);
+    margin:auto;
+}
+
+/* HOME */
+
+.hero{
+    text-align:center;
+    padding:80px 20px 55px;
+}
+
+.hero h1{
+    font-size:clamp(50px,9vw,100px);
+    line-height:.9;
+    font-weight:1000;
+    background:linear-gradient(
+        90deg,
+        #00f7ff,
+        white,
+        #ff20d4,
+        #00f7ff
+    );
+    background-size:300%;
+    -webkit-background-clip:text;
+    color:transparent;
+    animation:gradient 5s linear infinite;
+}
+
+@keyframes gradient{
+    to{background-position:300%}
+}
+
+.hero p{
+    max-width:650px;
+    margin:25px auto;
+    color:#9ba8bc;
+    line-height:1.6;
+    font-size:18px;
+}
+
+.big-btn{
+    border:0;
+    padding:15px 28px;
+    border-radius:12px;
+    background:var(--cyan);
+    color:#001014;
+    font-weight:900;
+    cursor:pointer;
+    box-shadow:0 0 30px rgba(0,247,255,.3);
+}
+
+.section{
+    padding-bottom:80px;
+}
+
+.section-title{
+    margin-bottom:20px;
+}
+
+.games{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:18px;
+}
+
+.game-card{
+    position:relative;
+    min-height:210px;
+    padding:24px;
+    border-radius:20px;
+    border:1px solid rgba(255,255,255,.08);
+    background:linear-gradient(145deg,#11182b,#080b15);
+    cursor:pointer;
+    transition:.25s;
+}
+
+.game-card:hover{
+    transform:translateY(-7px);
+    border-color:var(--cyan);
+    box-shadow:0 15px 50px rgba(0,247,255,.12);
+}
+
+.game-icon{
+    font-size:43px;
+    margin-bottom:17px;
+}
+
+.game-card h3{
+    margin-bottom:9px;
+}
+
+.game-card p{
+    color:#8490a5;
+    line-height:1.5;
+}
+
+.tag{
+    position:absolute;
+    top:13px;
+    right:13px;
+    color:#ff73e6;
+    background:rgba(255,32,212,.12);
+    padding:5px 8px;
+    border-radius:7px;
+    font-size:10px;
+}
+
+/* COMMON GAME */
+
+.game-shell{
+    padding:30px 0 70px;
+}
+
+.back{
+    margin-bottom:15px;
+    padding:10px 14px;
+    color:#b8c5d8;
+    background:#0d1424;
+    border:1px solid #24334e;
+    border-radius:9px;
+    cursor:pointer;
+}
+
+.game-top{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-bottom:15px;
+}
+
+.stat{
+    padding:11px 16px;
+    background:#090f1d;
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:10px;
+}
+
+.stat span{
+    color:var(--cyan);
+    font-weight:bold;
+}
+
+
+/* =========================================
+   ZTYPE
+========================================= */
+
+#ztype{
+    position:relative;
+    height:650px;
+    overflow:hidden;
+    border-radius:18px;
+    border:1px solid rgba(0,247,255,.25);
+    background:
+        radial-gradient(circle at 50% 55%,#101d42,transparent 48%),
+        #02040a;
+    box-shadow:
+        inset 0 0 120px #000,
+        0 0 35px rgba(0,247,255,.08);
+}
+
+/*
+    Muhim:
+    INPUT YO'Q.
+
+    Foydalanuvchi to'g'ridan-to'g'ri
+    klaviaturadan yozadi.
+*/
+
+.zword{
+    position:absolute;
+    z-index:5;
+    font-family:monospace;
+    font-size:20px;
+    font-weight:bold;
+    white-space:nowrap;
+    color:#fff;
+    text-shadow:
+        0 0 7px #fff,
+        0 0 14px #398dff;
+}
+
+.zword .typed{
+    color:#00f7ff;
+    text-shadow:
+        0 0 7px #00f7ff,
+        0 0 18px #00f7ff;
+}
+
+.zword.danger{
+    color:#ff3d5d;
+    text-shadow:
+        0 0 10px red,
+        0 0 20px red;
+}
+
+.star{
+    position:absolute;
+    width:2px;
+    height:2px;
+    background:white;
+    border-radius:50%;
+    opacity:.6;
+}
+
+.laser{
+    position:absolute;
+    width:3px;
+    height:90px;
+    background:linear-gradient(
+        to top,
+        transparent,
+        #00f7ff,
+        white
+    );
+    box-shadow:0 0 15px #00f7ff;
+    z-index:10;
+    animation:laser .22s linear forwards;
+}
+
+@keyframes laser{
+    from{
+        opacity:1;
+        transform:scaleY(.2);
+    }
+    to{
+        opacity:0;
+        transform:scaleY(1);
+    }
+}
+
+.explosion{
+    position:absolute;
+    width:12px;
+    height:12px;
+    border:2px solid #00f7ff;
+    border-radius:50%;
+    box-shadow:0 0 20px #00f7ff;
+    z-index:20;
+    animation:explode .35s ease-out forwards;
+}
+
+@keyframes explode{
+    to{
+        transform:scale(7);
+        opacity:0;
+    }
+}
+
+.zship{
+    position:absolute;
+    bottom:20px;
+    left:50%;
+    transform:translateX(-50%);
+    width:0;
+    height:0;
+    border-left:15px solid transparent;
+    border-right:15px solid transparent;
+    border-bottom:40px solid var(--cyan);
+    filter:drop-shadow(0 0 10px var(--cyan));
+    z-index:4;
+}
+
+.z-hint{
+    text-align:center;
+    color:#66758d;
+    margin-top:12px;
+    font-family:monospace;
+}
+
+
+/* =========================================
+   MONKEYTYPE STYLE
+========================================= */
+
+#monkeyScreen{
+    min-height:calc(100vh - 70px);
+}
+
+.monkey-panel{
+    min-height:600px;
+    padding:40px;
+    border-radius:18px;
+    border:1px solid rgba(255,255,255,.08);
+    background:#080c15;
+    box-shadow:inset 0 0 100px rgba(0,0,0,.4);
+}
+
+.monkey-settings{
+    display:flex;
+    justify-content:center;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-bottom:35px;
+}
+
+.monkey-settings button{
+    padding:8px 14px;
+    color:#7d899e;
+    background:#0d1422;
+    border:1px solid #1c2940;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+.monkey-settings button.active{
+    color:#00f7ff;
+    border-color:#00f7ff;
+}
+
+#typingText{
+    max-width:1000px;
+    margin:0 auto;
+    font-family:monospace;
+    font-size:clamp(20px,3vw,28px);
+    line-height:1.8;
+    color:#68758a;
+    user-select:none;
+    min-height:180px;
+}
+
+#typingText span.correct{
+    color:#fff;
+}
+
+#typingText span.wrong{
+    color:#ff3150;
+    text-decoration:underline;
+}
+
+#typingText span.current{
+    border-left:2px solid #00f7ff;
+    animation:caret .7s infinite;
+}
+
+@keyframes caret{
+    50%{border-color:transparent}
+}
+
+.monkey-info{
+    display:flex;
+    justify-content:center;
+    gap:35px;
+    flex-wrap:wrap;
+    margin-top:45px;
+}
+
+.monkey-number{
+    font-family:monospace;
+    font-size:35px;
+    color:#00f7ff;
+}
+
+.monkey-label{
+    color:#58667b;
+    font-size:12px;
+    text-align:center;
+    margin-top:3px;
+}
+
+.monkey-start{
+    text-align:center;
+    color:#58667b;
+    margin-top:35px;
+}
+
+
+/* =========================================
+   HACKER
+========================================= */
+
+.hacker-box{
+    height:650px;
+    padding:25px;
+    overflow:hidden;
+    border-radius:18px;
+    border:1px solid rgba(0,255,102,.35);
+    background:#010603;
+    box-shadow:inset 0 0 100px rgba(0,255,102,.05);
+    font-family:"Courier New",monospace;
+}
+
+#hackCode{
+    color:#00ff66;
+    font-size:15px;
+    line-height:1.5;
+    white-space:pre-wrap;
+    text-shadow:0 0 8px #00ff66;
+}
+
+.hack-cursor{
+    display:inline-block;
+    width:9px;
+    height:18px;
+    background:#00ff66;
+    animation:blink .7s infinite;
+}
+
+@keyframes blink{
+    50%{opacity:0}
+}
+
+.hacker-input{
+    position:absolute;
+    opacity:0;
+}
+
+
+/* AIM */
+
+#aimGame{
+    position:relative;
+    height:600px;
+    overflow:hidden;
+    border-radius:18px;
+    background:#070a14;
+    border:1px solid rgba(255,255,255,.1);
+}
+
+.target{
+    position:absolute;
+    width:65px;
+    height:65px;
+    border-radius:50%;
+    background:
+        radial-gradient(
+            circle,
+            white 0 8%,
+            red 9% 28%,
+            white 29% 42%,
+            red 43% 60%,
+            transparent 61%
+        );
+    cursor:pointer;
+    box-shadow:0 0 25px rgba(255,0,60,.5);
+}
+
+
+/* MEMORY */
+
+.memory-grid{
+    max-width:600px;
+    margin:25px auto;
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:12px;
+}
+
+.memory-card{
+    aspect-ratio:1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:30px;
+    border-radius:12px;
+    border:1px solid #24334e;
+    background:#0b1120;
+    cursor:pointer;
+}
+
+.memory-card.open{
+    background:#16213b;
+}
+
+
+/* REACTION */
+
+.reaction{
+    min-height:520px;
+    border-radius:18px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    background:#111725;
+    cursor:pointer;
+    user-select:none;
+}
+
+.reaction.wait{
+    background:#570c1b;
+}
+
+.reaction.go{
+    background:#064d2b;
+}
+
+.reaction-text{
+    font-size:clamp(25px,5vw,65px);
+    font-weight:1000;
+}
+
+
+/* CLICK */
+
+.clicker{
+    min-height:500px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-direction:column;
+    background:#080c17;
+    border-radius:18px;
+    border:1px solid #20304a;
+}
+
+.click-circle{
+    width:200px;
+    height:200px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:radial-gradient(circle,#16354a,#050b12);
+    border:4px solid var(--cyan);
+    box-shadow:0 0 50px rgba(0,247,255,.25);
+    cursor:pointer;
+    font-size:30px;
+    font-weight:bold;
+}
+
+footer{
+    padding:40px;
+    text-align:center;
+    color:#526078;
+    border-top:1px solid rgba(255,255,255,.05);
+}
+
+@media(max-width:700px){
+
+    header{
+        flex-direction:column;
+        align-items:flex-start;
+    }
+
+    nav{
+        width:100%;
+    }
+
+    .monkey-panel{
+        padding:20px;
+    }
+
+    #ztype,
+    #aimGame{
+        height:520px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+
+<header>
+
+<div class="logo">NEON ARCADE</div>
+
+<nav>
+
+<button class="active"
+onclick="showScreen('home')">
+Home
+</button>
+
+<button onclick="showScreen('typingScreen')">
+⌨️ ZType
+</button>
+
+<button onclick="showScreen('monkeyScreen')">
+⌨️ Type Test
+</button>
+
+<button onclick="showScreen('hackerScreen')">
+💻 Hacker
+</button>
+
+<button onclick="showScreen('aimScreen')">
+🎯 Aim
+</button>
+
+<button onclick="showScreen('memoryScreen')">
+🧠 Memory
+</button>
+
+<button onclick="showScreen('reactionScreen')">
+⚡ Reaction
+</button>
+
+<button onclick="showScreen('clickScreen')">
+🔥 Click
+</button>
+
+</nav>
+
+</header>
+
+
+<!-- HOME -->
+
+<section id="home" class="screen active">
+
+<div class="hero">
+
+<h1>NEON ARCADE</h1>
+
+<p>
+Typing, reflex, memory va mini o‘yinlar.
+Bir sayt — cheksiz vaqt.
+</p>
+
+<button class="big-btn"
+onclick="showScreen('typingScreen')">
+🚀 PLAY
+</button>
+
+</div>
+
+
+<div class="container section">
+
+<h2 class="section-title">
+🎮 O‘YINLAR
+</h2>
+
+<div class="games">
+
+
+<div class="game-card"
+onclick="showScreen('typingScreen')">
+
+<div class="game-icon">⌨️</div>
+
+<h3>ZType Word Hunter</h3>
+
+<p>
+Input oynasisiz typing shooter.
+So‘zni klaviaturada yozing va
+uni lazer bilan yo‘q qiling.
+</p>
+
+</div>
+
+
+<div class="game-card"
+onclick="showScreen('monkeyScreen')">
+
+<div class="tag">NEW</div>
+
+<div class="game-icon">⌨️</div>
+
+<h3>Type Test</h3>
+
+<p>
+Monkeytype uslubidagi typing test.
+WPM, accuracy va timer.
+</p>
+
+</div>
+
+
+<div class="game-card"
+onclick="showScreen('hackerScreen')">
+
+<div class="game-icon">💻</div>
+
+<h3>Hacker Typer</h3>
+
+<p>
+Istalgan tugmani bosing.
+Ekranda yashil hacker kodlari paydo bo‘ladi.
+</p>
+
+</div>
+
+
+<div class="game-card"
+onclick="showScreen('aimScreen')">
+
+<div class="game-icon">🎯</div>
+
+<h3>Aim Rush</h3>
+
+<p>
+30 soniyada maksimal nishon uring.
+</p>
+
+</div>
+
+
+<div class="game-card"
+onclick="showScreen('memoryScreen')">
+
+<div class="game-icon">🧠</div>
+
+<h3>Memory</h3>
+
+<p>
+Emoji juftliklarini toping.
+</p>
+
+</div>
+
+
+<div class="game-card"
+onclick="showScreen('reactionScreen')">
+
+<div class="game-icon">⚡</div>
+
+<h3>Reaction</h3>
+
+<p>
+Qizil — bosmang.
+Yashil — imkon qadar tez bosing.
+</p>
+
+</div>
+
+
+<div class="game-card"
+onclick="showScreen('clickScreen')">
+
+<div class="game-icon">🔥</div>
+
+<h3>Click Rush</h3>
+
+<p>
+10 soniyada maksimal click.
+</p>
+
+</div>
+
+
+</div>
+</div>
+
+</section>
+
+
+<!-- ===================================
+     ZTYPE
+=================================== -->
+
+<section id="typingScreen" class="screen">
+
+<div class="game-shell">
+
+<button class="back"
+onclick="showScreen('home')">
+← Home
+</button>
+
+<div class="game-top">
+
+<div class="stat">
+Score: <span id="score">0</span>
+</div>
+
+<div class="stat">
+Level: <span id="level">1</span>
+</div>
+
+<div class="stat">
+Combo: <span id="combo">0</span>
+</div>
+
+<div class="stat">
+Lives: <span id="lives">3</span>
+</div>
+
+</div>
+
+
+<div id="ztype">
+
+<div class="zship"></div>
+
+</div>
+
+
+<div class="z-hint">
+Klaviaturada yozishni boshlang — input oynasi yo‘q.
+Xato harfni o‘chirish shart emas.
+</div>
+
+</div>
+
+</section>
+
+
+<!-- ===================================
+     MONKEYTYPE
+=================================== -->
+
+<section id="monkeyScreen" class="screen">
+
+<div class="game-shell">
+
+<button class="back"
+onclick="showScreen('home')">
+← Home
+</button>
+
+
+<div class="monkey-panel">
+
+<div class="monkey-settings">
+
+<button
+class="active"
+onclick="setTestTime(15,this)">
+15s
+</button>
+
+<button
+onclick="setTestTime(30,this)">
+30s
+</button>
+
+<button
+onclick="setTestTime(60,this)">
+60s
+</button>
+
+</div>
+
+
+<div id="typingText"></div>
+
+
+<div class="monkey-info">
+
+<div>
+<div class="monkey-number"
+id="wpm">
+0
+</div>
+
+<div class="monkey-label">
+WPM
+</div>
+</div>
+
+
+<div>
+<div class="monkey-number"
+id="accuracy">
+100%
+</div>
+
+<div class="monkey-label">
+ACCURACY
+</div>
+</div>
+
+
+<div>
+<div class="monkey-number"
+id="timeLeft">
+15
+</div>
+
+<div class="monkey-label">
+SECONDS
+</div>
+</div>
+
+</div>
+
+
+<div class="monkey-start"
+id="monkeyStatus">
+
+Type to start...
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- ===================================
+     HACKER
+=================================== -->
+
+<section id="hackerScreen" class="screen">
+
+<div class="game-shell">
+
+<button class="back"
+onclick="showScreen('home')">
+← Home
+</button>
+
+<div class="hacker-box">
+
+<pre id="hackCode"></pre>
+<span class="hack-cursor"></span>
+
+</div>
+
+<p style="
+color:#61708a;
+margin-top:12px;
+font-family:monospace;
+">
+Ekranga bosing va istalgan tugmani bosing.
+</p>
+
+</div>
+
+</section>
+
+
+<!-- AIM -->
+
+<section id="aimScreen" class="screen">
+
+<div class="game-shell">
+
+<button class="back"
+onclick="showScreen('home')">
+← Home
+</button>
+
+<div class="game-top">
+
+<div class="stat">
+Score: <span id="aimScore">0</span>
+</div>
+
+<div class="stat">
+Time: <span id="aimTime">30</span>
+</div>
+
+</div>
+
+
+<div id="aimGame">
+
+<button
+class="big-btn"
+id="aimStart"
+style="
+position:absolute;
+left:50%;
+top:50%;
+transform:translate(-50%,-50%);
+"
+onclick="startAim()">
+🎯 START
+</button>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- MEMORY -->
+
+<section id="memoryScreen" class="screen">
+
+<div class="game-shell">
+
+<button class="back"
+onclick="showScreen('home')">
+← Home
+</button>
+
+<div class="game-top">
+
+<div class="stat">
+Moves: <span id="moves">0</span>
+</div>
+
+<div class="stat">
+Pairs: <span id="pairs">0</span>/8
+</div>
+
+</div>
+
+<div
+id="memoryGrid"
+class="memory-grid">
+</div>
+
+</div>
+
+</section>
+
+
+<!-- REACTION -->
+
+<section id="reactionScreen" class="screen">
+
+<div class="game-shell">
+
+<button class="back"
+onclick="showScreen('home')">
+← Home
+</button>
+
+<div
+id="reactionBox"
+class="reaction"
+onclick="reactionClick()">
+
+<div
+id="reactionText"
+class="reaction-text">
+
+BOSHLASH UCHUN BOSING
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- CLICK -->
+
+<section id="clickScreen" class="screen">
+
+<div class="game-shell">
+
+<button class="back"
+onclick="showScreen('home')">
+← Home
+</button>
+
+<div class="clicker">
+
+<div class="stat"
+style="margin-bottom:25px">
+
+Clicks:
+<span id="clickScore">0</span>
+
+&nbsp; | &nbsp;
+
+Time:
+<span id="clickTime">10</span>
+
+</div>
+
+<div
+id="clickCircle"
+class="click-circle">
+
+START
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+<footer>
+NEON ARCADE © 2026
+</footer>
+
+
+<script>
+
+/* ==========================================
+   NAVIGATION
+========================================== */
+
+function showScreen(id){
+
+document
+.querySelectorAll(".screen")
+.forEach(x=>x.classList.remove("active"));
+
+document
+.getElementById(id)
+.classList.add("active");
+
+document
+.querySelectorAll("nav button")
+.forEach(x=>x.classList.remove("active"));
+
+if(id==="typingScreen"){
+startZType();
+}
+
+if(id==="monkeyScreen"){
+startMonkeyTest();
+}
+
+if(id==="memoryScreen"){
+createMemory();
+}
+
+if(id==="clickScreen"){
+resetClick();
+}
+
+window.scrollTo({
+top:0,
+behavior:"smooth"
+});
+
+}
+
+
+/* ==========================================
+   ZTYPE
+========================================== */
+
+/*
+    So'zlar ataylab qisqartirildi.
+*/
+
+const zWords=[
+
+"javascript",
+"computer",
+"keyboard",
+"rocket",
+"planet",
+"galaxy",
+"space",
+"cyber",
+"matrix",
+"network",
+"python",
+"coding",
+"robot",
+"energy",
+"power",
+"speed",
+"dragon",
+"ninja",
+"warrior",
+"legend",
+"magic",
+"castle",
+"battle",
+"victory",
+"diamond",
+"crystal",
+"pixel",
+"game",
+"player",
+"score",
+"level",
+"combo",
+"quantum",
+"gravity",
+"universe",
+"star",
+"moon",
+"earth",
+"music",
+"guitar",
+"camera",
+"design",
+"secret",
+"portal",
+"mission",
+"target",
+"hunter",
+"master",
+"focus",
+"memory",
+"reflex",
+"precision"
+
+];
+
+
+let zPool=[];
+let zActive=[];
+
+let zScore=0;
+let zLevel=1;
+let zCombo=0;
+let zLives=3;
+
+let zRunning=false;
+let zSpawnTimer=null;
+let zKeyBuffer="";
+
+
+function shuffle(arr){
+
+for(let i=arr.length-1;i>0;i--){
+
+const j=
+Math.floor(Math.random()*(i+1));
+
+[arr[i],arr[j]]
+=
+[arr[j],arr[i]];
+
+}
+
+return arr;
+
+}
+
+
+function resetZPool(){
+
+zPool=shuffle([...zWords]);
+
+}
+
+
+function getZWord(){
+
+if(zPool.length===0){
+
+resetZPool();
+
+}
+
+return zPool.pop();
+
+}
+
+
+function createZStars(){
+
+const area=
+document.getElementById("ztype");
+
+for(let i=0;i<75;i++){
+
+const star=
+document.createElement("div");
+
+star.className="star";
+
+star.style.left=
+Math.random()*100+"%";
+
+star.style.top=
+Math.random()*100+"%";
+
+area.appendChild(star);
+
+}
+
+}
+
+
+function startZType(){
+
+clearInterval(zSpawnTimer);
+
+const area=
+document.getElementById("ztype");
+
+area.innerHTML=
+'<div class="zship"></div>';
+
+createZStars();
+
+zPool=[];
+zActive=[];
+
+resetZPool();
+
+zScore=0;
+zLevel=1;
+zCombo=0;
+zLives=3;
+
+zKeyBuffer="";
+
+zRunning=true;
+
+updateZUI();
+
+spawnZWord();
+
+zSpawnTimer=setInterval(()=>{
+
+if(zRunning){
+
+spawnZWord();
+
+}
+
+},1150);
+
+}
+
+
+/*
+    ZTYPE uslubida:
+    input element yo'q.
+
+    Keydown orqali to'g'ridan-to'g'ri
+    ekrandagi so'zlar bilan ishlaymiz.
+*/
+
+document.addEventListener("keydown",function(e){
+
+if(!zRunning)return;
+
+const screen=
+document.getElementById("typingScreen");
+
+if(!screen.classList.contains("active"))
+return;
+
+
+/*
+    Faqat harf/raqam tugmalari.
+*/
+
+if(
+e.key.length!==1 ||
+!/[a-zA-Z0-9]/.test(e.key)
+){
+return;
+}
+
+const char=
+e.key.toLowerCase();
+
+
+/*
+    Agar buffer hozirgi targetga mos bo'lmasa,
+    yangi target qidiriladi.
+
+    Xato harf bosilganda:
+    - hech narsa o'chirilmaydi
+    - foydalanuvchi backspace bosishi shart emas
+    - keyingi to'g'ri harfni bosishi mumkin
+*/
+
+let target=null;
+
+
+/*
+    Avval davom etayotgan targetni qidiramiz.
+*/
+
+for(const obj of zActive){
+
+if(
+obj.text
+.toLowerCase()
+.startsWith(zKeyBuffer+char)
+){
+
+target=obj;
+break;
+
+}
+
+}
+
+
+/*
+    Agar davom etayotgan so'z topilmasa,
+    yangi so'zning birinchi harfidan qidiramiz.
+*/
+
+if(!target){
+
+zKeyBuffer="";
+
+for(const obj of zActive){
+
+if(
+obj.text[0].toLowerCase()===char
+){
+
+target=obj;
+break;
+
+}
+
+}
+
+if(!target){
+
+zCombo=0;
+updateZUI();
+return;
+
+}
+
+}
+
+
+/*
+    Yangi harfni bufferga qo'shamiz.
+*/
+
+zKeyBuffer+=char;
+
+const span=
+target.element.querySelector("span");
+
+span.innerHTML=
+`<span class="typed">${zKeyBuffer}</span>`+
+target.text.slice(zKeyBuffer.length);
+
+
+/*
+    SO'Z TUGADI
+*/
+
+if(zKeyBuffer===target.text){
+
+fireZLaser(target);
+
+target.element.remove();
+
+zActive=
+zActive.filter(x=>x!==target);
+
+zScore+=
+10+
+(zLevel*5)+
+zCombo;
+
+zCombo++;
+
+if(zCombo%7===0){
+
+zLevel++;
+
+}
+
+zKeyBuffer="";
+
+updateZUI();
+
+}
+
+});
+
+
+function spawnZWord(){
+
+if(!zRunning)return;
+
+const area=
+document.getElementById("ztype");
+
+const text=getZWord();
+
+const el=
+document.createElement("div");
+
+el.className="zword";
+
+el.innerHTML=
+`<span>${text}</span>`;
+
+
+/*
+    ZTypega o'xshash turli pozitsiyalar.
+*/
+
+const maxX=
+Math.max(
+20,
+area.clientWidth-220
+);
+
+el.style.left=
+Math.random()*maxX+"px";
+
+el.style.top="-40px";
+
+area.appendChild(el);
+
+const obj={
+
+text:text,
+
+element:el,
+
+y:-40,
+
+speed:
+0.45+
+(zLevel*.075)+
+Math.random()*.2
+
+};
+
+zActive.push(obj);
+
+moveZWord(obj);
+
+}
+
+
+function moveZWord(obj){
+
+if(!zRunning)return;
+
+if(!document.body.contains(obj.element))
+return;
+
+obj.y+=obj.speed;
+
+obj.element.style.top=
+obj.y+"px";
+
+
+if(
+obj.y>
+document.getElementById("ztype").clientHeight*.70
+){
+
+obj.element.classList.add("danger");
+
+}
+
+
+if(
+obj.y>
+document.getElementById("ztype").clientHeight-55
+){
+
+obj.element.remove();
+
+zActive=
+zActive.filter(x=>x!==obj);
+
+zLives--;
+
+zCombo=0;
+
+zKeyBuffer="";
+
+updateZUI();
+
+if(zLives<=0){
+
+endZType();
+
+return;
+
+}
+
+}
+
+requestAnimationFrame(()=>{
+moveZWord(obj);
+});
+
+}
+
+
+function fireZLaser(obj){
+
+const area=
+document.getElementById("ztype");
+
+const areaRect=
+area.getBoundingClientRect();
+
+const rect=
+obj.element.getBoundingClientRect();
+
+const laser=
+document.createElement("div");
+
+laser.className="laser";
+
+laser.style.left=
+(rect.left-
+areaRect.left+
+rect.width/2)+"px";
+
+laser.style.bottom="55px";
+
+area.appendChild(laser);
+
+setTimeout(()=>{
+laser.remove();
+},250);
+
+
+const explosion=
+document.createElement("div");
+
+explosion.className="explosion";
+
+explosion.style.left=
+(rect.left-
+areaRect.left+
+rect.width/2)+"px";
+
+explosion.style.top=
+(rect.top-
+areaRect.top+
+rect.height/2)+"px";
+
+area.appendChild(explosion);
+
+setTimeout(()=>{
+explosion.remove();
+},400);
+
+}
+
+
+function updateZUI(){
+
+document.getElementById("score")
+.textContent=zScore;
+
+document.getElementById("level")
+.textContent=zLevel;
+
+document.getElementById("combo")
+.textContent=zCombo;
+
+document.getElementById("lives")
+.textContent=zLives;
+
+}
+
+
+function endZType(){
+
+zRunning=false;
+
+clearInterval(zSpawnTimer);
+
+setTimeout(()=>{
+
+alert(
+"💥 GAME OVER!\n\n"+
+"Score: "+zScore+
+"\nLevel: "+zLevel
+);
+
+},100);
+
+}
+
+
+/* ==========================================
+   MONKEYTYPE STYLE
+========================================== */
+
+const typingWords=[
+
+"the","of","and","to","in","is","you",
+"that","it","he","was","for","on","are",
+"as","with","his","they","I","at","be",
+"this","have","from","or","one","had",
+"by","word","but","not","what","all",
+"were","we","when","your","can","said",
+"there","use","an","each","which",
+"she","do","how","their","if","will",
+"up","other","about","out","many",
+"then","them","these","so","some",
+"her","would","make","like","him",
+"into","time","has","look","two",
+"more","write","go","see","number",
+"way","could","people","my","than",
+"first","water","been","call","who",
+"oil","its","now","find","long",
+"down","day","did","get","come",
+"made","may","part"
+
+];
+
+
+let monkeyText="";
+let monkeyIndex=0;
+let monkeyStartTime=null;
+let monkeyTimer=null;
+let monkeyDuration=15;
+let monkeyStarted=false;
+let monkeyCorrect=0;
+let monkeyTyped=0;
+
+
+function generateMonkeyText(){
+
+let result=[];
+
+for(let i=0;i<150;i++){
+
+result.push(
+typingWords[
+Math.floor(
+Math.random()*typingWords.length
+)
+]);
+
+}
+
+return result.join(" ");
+
+}
+
+
+function renderMonkeyText(){
+
+const container=
+document.getElementById("typingText");
+
+container.innerHTML="";
+
+[...monkeyText].forEach((char,i)=>{
+
+const span=
+document.createElement("span");
+
+span.textContent=char;
+
+if(i===0){
+span.classList.add("current");
+}
+
+container.appendChild(span);
+
+});
+
+}
+
+
+function startMonkeyTest(){
+
+clearInterval(monkeyTimer);
+
+monkeyText=generateMonkeyText();
+
+monkeyIndex=0;
+monkeyStarted=false;
+monkeyStartTime=null;
+monkeyCorrect=0;
+monkeyTyped=0;
+
+renderMonkeyText();
+
+document.getElementById("wpm")
+.textContent="0";
+
+document.getElementById("accuracy")
+.textContent="100%";
+
+document.getElementById("timeLeft")
+.textContent=monkeyDuration;
+
+document.getElementById("monkeyStatus")
+.textContent="Type to start...";
+
+}
+
+
+function setTestTime(seconds,button){
+
+monkeyDuration=seconds;
+
+document
+.querySelectorAll(".monkey-settings button")
+.forEach(b=>b.classList.remove("active"));
+
+button.classList.add("active");
+
+startMonkeyTest();
+
+}
+
+
+/*
+    Monkeytype kabi input ko'rinmaydi.
+    To'g'ridan-to'g'ri keyboard.
+*/
+
+document.addEventListener("keydown",function(e){
+
+const screen=
+document.getElementById("monkeyScreen");
+
+if(
+!screen.classList.contains("active") ||
+e.key.length!==1
+){
+return;
+}
+
+if(monkeyIndex>=monkeyText.length)
+return;
+
+
+/*
+    TEST START
+*/
+
+if(!monkeyStarted){
+
+monkeyStarted=true;
+
+monkeyStartTime=Date.now();
+
+document.getElementById("monkeyStatus")
+.textContent="Typing...";
+
+monkeyTimer=setInterval(updateMonkeyTimer,100);
+
+}
+
+
+/*
+    SPACE va harflar
+*/
+
+const expected=
+monkeyText[monkeyIndex];
+
+const spans=
+document
+.getElementById("typingText")
+.children;
+
+
+/*
+    Agar yozilgan belgi to'g'ri bo'lsa
+*/
+
+if(e.key===expected){
+
+spans[monkeyIndex]
+.classList.remove("current");
+
+spans[monkeyIndex]
+.classList.add("correct");
+
+monkeyCorrect++;
+
+}else{
+
+/*
+    Xato yozilsa ham
+    backspace shart emas.
+    Keyingi harfga o'tmaydi.
+
+    Bu typing testni aniqroq qiladi.
+*/
+
+spans[monkeyIndex]
+.classList.add("wrong");
+
+updateMonkeyStats();
+
+return;
+
+}
+
+
+monkeyTyped++;
+
+monkeyIndex++;
+
+if(monkeyIndex<spans.length){
+
+spans[monkeyIndex]
+.classList.add("current");
+
+}
+
+updateMonkeyStats();
+
+
+/*
+    TEXT TUGADI
+*/
+
+if(monkeyIndex>=monkeyText.length){
+
+finishMonkeyTest();
+
+}
+
+});
+
+
+function updateMonkeyTimer(){
+
+if(!monkeyStarted)return;
+
+const elapsed=
+(Date.now()-monkeyStartTime)/1000;
+
+const remaining=
+Math.max(
+0,
+monkeyDuration-elapsed
+);
+
+document.getElementById("timeLeft")
+.textContent=
+Math.ceil(remaining);
+
+if(remaining<=0){
+
+finishMonkeyTest();
+
+}
+
+updateMonkeyStats();
+
+}
+
+
+function updateMonkeyStats(){
+
+if(!monkeyStarted){
+
+return;
+
+}
+
+const elapsed=
+Math.max(
+.1,
+(Date.now()-monkeyStartTime)/1000
+);
+
+const minutes=
+elapsed/60;
+
+const words=
+monkeyCorrect/5;
+
+const wpm=
+Math.round(words/minutes);
+
+const accuracy=
+monkeyTyped===0
+?100
+:Math.round(
+(monkeyCorrect/monkeyTyped)*100
+);
+
+document.getElementById("wpm")
+.textContent=
+Math.max(0,wpm);
+
+document.getElementById("accuracy")
+.textContent=
+accuracy+"%";
+
+}
+
+
+function finishMonkeyTest(){
+
+if(!monkeyStarted)return;
+
+monkeyStarted=false;
+
+clearInterval(monkeyTimer);
+
+updateMonkeyStats();
+
+document.getElementById("monkeyStatus")
+.textContent=
+"Test tugadi — qayta boshlash uchun tugmani bosing yoki yozishni boshlang.";
+
+}
+
+
+/* ==========================================
+   HACKER TYPER
+========================================== */
+
+const hackerLines=[
+
+"// INITIALIZING SECURE TERMINAL...",
+"const system = await connectToServer();",
+"bypassFirewall();",
+"encryptConnection();",
+"ACCESSING DATABASE...",
+"SELECT * FROM users WHERE admin = true;",
+"ssh root@192.168.0.1",
+"decrypt(packet.data);",
+"scanNetwork();",
+"analyzeTraffic();",
+"injectPayload();",
+"WARNING: UNAUTHORIZED ACCESS DETECTED",
+"deployExploit(target);",
+"overrideSecurity();",
+"ACCESS GRANTED...",
+"root@system:~#"
+
+];
+
+let hackerText="";
+let hackerIndex=0;
+
+document.addEventListener("keydown",function(e){
+
+const screen=
+document.getElementById("hackerScreen");
+
+if(!screen.classList.contains("active"))
+return;
+
+if(
+e.key==="Shift"||
+e.key==="Control"||
+e.key==="Alt"||
+e.key==="Tab"||
+e.key==="Escape"||
+e.key==="CapsLock"
+)return;
+
+let line;
+
+if(hackerIndex<hackerLines.length){
+
+line=hackerLines[hackerIndex++];
+
+}else{
+
+const commands=[
+"scanNetwork();",
+"decrypt(packet);",
+"overrideFirewall();",
+"injectPayload();",
+"connectToServer();",
+"downloadData();",
+"encryptDatabase();",
+"executeCommand();"
+];
+
+line=
+commands[
+Math.floor(Math.random()*commands.length)
+];
+
+}
+
+hackerText+=line+"\n";
+
+if(hackerText.length>10000){
+
+hackerText=
+hackerText.slice(-8000);
+
+}
+
+document.getElementById("hackCode")
+.textContent=hackerText;
+
+});
+
+
+/* ==========================================
+   AIM
+========================================== */
+
+let aimScore=0;
+let aimTime=30;
+let aimStarted=false;
+let aimInterval;
+
+function startAim(){
+
+if(aimStarted)return;
+
+aimStarted=true;
+aimScore=0;
+aimTime=30;
+
+document.getElementById("aimScore")
+.textContent=0;
+
+document.getElementById("aimTime")
+.textContent=30;
+
+document.getElementById("aimStart")
+.style.display="none";
+
+spawnTarget();
+
+aimInterval=setInterval(()=>{
+
+aimTime--;
+
+document.getElementById("aimTime")
+.textContent=aimTime;
+
+if(aimTime<=0){
+
+clearInterval(aimInterval);
+
+aimStarted=false;
+
+const t=
+document.querySelector("#aimGame .target");
+
+if(t)t.remove();
+
+document.getElementById("aimStart")
+.style.display="block";
+
+alert("🎯 SCORE: "+aimScore);
+
+}
+
+},1000);
+
+}
+
+
+function spawnTarget(){
+
+if(!aimStarted)return;
+
+const area=
+document.getElementById("aimGame");
+
+const old=
+area.querySelector(".target");
+
+if(old)old.remove();
+
+const target=
+document.createElement("div");
+
+target.className="target";
+
+target.style.left=
+Math.random()*
+(area.clientWidth-65)+"px";
+
+target.style.top=
+Math.random()*
+(area.clientHeight-65)+"px";
+
+target.onclick=()=>{
+
+aimScore++;
+
+document.getElementById("aimScore")
+.textContent=aimScore;
+
+spawnTarget();
+
+};
+
+area.appendChild(target);
+
+}
+
+
+/* ==========================================
+   MEMORY
+========================================== */
+
+const emojis=[
+"🚀","👾","🔥","⚡",
+"🎮","💎","🧠","🌙"
+];
+
+let openCards=[];
+let pairs=0;
+let moves=0;
+let memoryLock=false;
+
+function createMemory(){
+
+const grid=
+document.getElementById("memoryGrid");
+
+grid.innerHTML="";
+
+openCards=[];
+pairs=0;
+moves=0;
+memoryLock=false;
+
+document.getElementById("pairs")
+.textContent=0;
+
+document.getElementById("moves")
+.textContent=0;
+
+[...emojis,...emojis]
+.sort(()=>Math.random()-.5)
+.forEach(emoji=>{
+
+const card=
+document.createElement("div");
+
+card.className="memory-card";
+
+card.dataset.emoji=emoji;
+
+card.textContent="❓";
+
+card.onclick=()=>flipCard(card);
+
+grid.appendChild(card);
+
+});
+
+}
+
+
+function flipCard(card){
+
+if(
+memoryLock||
+card.classList.contains("open")
+)return;
+
+card.classList.add("open");
+
+card.textContent=
+card.dataset.emoji;
+
+openCards.push(card);
+
+if(openCards.length!==2)
+return;
+
+moves++;
+
+document.getElementById("moves")
+.textContent=moves;
+
+const a=openCards[0];
+const b=openCards[1];
+
+if(a.dataset.emoji===b.dataset.emoji){
+
+pairs++;
+
+document.getElementById("pairs")
+.textContent=pairs;
+
+openCards=[];
+
+if(pairs===8){
+
+setTimeout(()=>{
+
+alert(
+"🧠 PERFECT!\nMoves: "+moves
+);
+
+createMemory();
+
+},300);
+
+}
+
+}else{
+
+memoryLock=true;
+
+setTimeout(()=>{
+
+a.classList.remove("open");
+b.classList.remove("open");
+
+a.textContent="❓";
+b.textContent="❓";
+
+openCards=[];
+memoryLock=false;
+
+},700);
+
+}
+
+}
+
+
+/* ==========================================
+   REACTION
+========================================== */
+
+let reactionState="ready";
+let reactionTimer;
+let reactionStart;
+
+function reactionClick(){
+
+const box=
+document.getElementById("reactionBox");
+
+const text=
+document.getElementById("reactionText");
+
+
+if(reactionState==="ready"){
+
+reactionState="wait";
+
+box.className="reaction wait";
+
+text.innerHTML=
+"🔴<br>WAIT...";
+
+reactionTimer=setTimeout(()=>{
+
+reactionState="go";
+
+box.className="reaction go";
+
+text.innerHTML=
+"🟢<br>CLICK!";
+
+reactionStart=
+performance.now();
+
+},1200+Math.random()*3000);
+
+return;
+
+}
+
+
+if(reactionState==="wait"){
+
+clearTimeout(reactionTimer);
+
+reactionState="ready";
+
+box.className="reaction";
+
+text.innerHTML=
+"❌<br>YUTQAZDINGIZ!<br>"+
+"<small>Qizil paytda bosdingiz.</small>";
+
+return;
+
+}
+
+
+if(reactionState==="go"){
+
+const time=
+Math.round(
+performance.now()-reactionStart
+);
+
+reactionState="ready";
+
+box.className="reaction";
+
+text.innerHTML=
+"⚡ "+time+" ms<br>"+
+"<small>Qayta o‘ynash uchun bosing</small>";
+
+}
+
+}
+
+
+/* ==========================================
+   CLICK
+========================================== */
+
+let clickScore=0;
+let clickTime=10;
+let clickActive=false;
+let clickTimer;
+
+const clickCircle=
+document.getElementById("clickCircle");
+
+clickCircle.onclick=()=>{
+
+if(!clickActive){
+
+startClick();
+
+}else{
+
+clickScore++;
+
+document.getElementById("clickScore")
+.textContent=clickScore;
+
+}
+
+};
+
+
+function resetClick(){
+
+clearInterval(clickTimer);
+
+clickScore=0;
+clickTime=10;
+clickActive=false;
+
+document.getElementById("clickScore")
+.textContent=0;
+
+document.getElementById("clickTime")
+.textContent=10;
+
+clickCircle.textContent="START";
+
+}
+
+
+function startClick(){
+
+clickActive=true;
+
+clickScore=0;
+clickTime=10;
+
+clickCircle.textContent="CLICK!";
+
+clickTimer=setInterval(()=>{
+
+clickTime--;
+
+document.getElementById("clickTime")
+.textContent=clickTime;
+
+if(clickTime<=0){
+
+clearInterval(clickTimer);
+
+clickActive=false;
+
+clickCircle.textContent=
+clickScore;
+
+alert(
+"🔥 CLICK RUSH!\n"+
+"Clicks: "+clickScore
+);
+
+}
+
+},1000);
+
+}
+
+</script>
+
+</body>
+</html>
+```
